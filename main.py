@@ -11,5 +11,5 @@ from demo_milestone3 import run_milestone2_demo
 
 # Uncomment the lines below to run the demo
 #if __name__ == "__main__":
-    #run_milestone2_demo()
+    #run_milestone3_demo()
 
