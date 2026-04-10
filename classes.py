@@ -9,6 +9,75 @@ GRADE_POINTS = {
 'N/A': 0.0
 }
 
+# Hashmap
+class HashNode:
+    """ Node for HashMap chaining
+    Designed by: Mufeed Dudha"""
+    def __init__(self, key, value):
+        """Initialize a hash node with key, value, and next pointer."""
+        self.key = key
+        self.value = value
+        self.next = None
+
+class HashMap:
+    """ A simple HashMap implementation using chaining for collision resolution.
+    Designed by: Mufeed Dudha"""
+    def __init__(self, capacity=10):
+        """Initialize a hash map with a specified capacity and empty buckets."""
+        self.capacity = capacity
+        self.size = 0
+        self.table = [None] * capacity
+
+    def _hash(self, key):
+        """Compute the hash value for a given key."""
+        return hash(key) % self.capacity
+    
+    def put(self, key, value):
+        """Insert or update a key-value pair in the hash map."""
+        if self.size / self.capacity > 0.8:
+            self.rehash()
+
+        index = self._hash(key)
+        if self.table[index] is None:
+            self.table[index] = HashNode(key, value)
+            self.size += 1
+        else:
+            curr = self.table[index]
+            while curr:
+                if curr.key == key:
+                    curr.value = value
+                    return
+                if curr.next is None:
+                    break
+                curr = curr.next
+            curr.next = HashNode(key, value)
+            self.size += 1
+
+    def get(self, key):
+        """Retrieve the value associated with a given key."""
+        index = self._hash(key)
+        curr = self.table[index]
+
+        while curr:
+            if curr.key == key:
+                return curr.value
+            curr = curr.next
+        return None
+
+    def rehash(self):
+        """Resize the hash table and rehash all existing key-value pairs."""
+        old_table = self.table
+        self.capacity *= 2
+        self.table = [None] * self.capacity
+        self.size = 0
+
+        for node in old_table:
+            curr = node
+            while curr:
+                self.put(curr.key, curr.value)
+                curr = curr.next
+
+
 # Extra Credit: Stack For Undo
 class StackNode:
     """ Node for LinkedStack
