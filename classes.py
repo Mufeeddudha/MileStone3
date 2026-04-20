@@ -226,6 +226,7 @@ class Course:
         self.capacity = capacity
          
 
+        self.prerequisite = None
         self.enrolled_roster = []
         self.waitlist = LinkedQueue()
         self.undo_stack = LinkedStack()
@@ -240,7 +241,32 @@ class Course:
     # Waitlist and Enrollment
     def request_enroll(self, student, grade, enroll_date):
         """Attempts to enroll a student, pushing to waitlist if at capacity, adds them to the waitlist."""
-        for record in self.enrolled_roster:
+
+        if self.prerequisite:
+            """"""
+            prev_grade = student.courses.get(self.prerequisite)
+
+            if prev_grade is None:
+                raise ValueError(f"Missing prerequisite: {self.prerequisite}")
+            
+            if prev_grade == 'F':
+                raise ValueError(f"Failed prerequisite: {self.prerequisite}")
+            
+        if any(rec.student.student_id == student.student_id for rec in self.enrolled_roster):
+            raise ValueError("Student is already enrolled.")
+        
+        new_record = EnrollmentRecord(student, enroll_date)
+        if len(self.enrolled_roster) < self.capacity:
+            self.enrolled_roster.append(new_record)
+            student.courses[self.course_code] = grade
+            self.undo_stack.push(("enroll", new_record))
+            return f"{student.student_id} enrolled in {self.course_code}"
+        else:
+            self.waitlist.enqueue(new_record)
+            self.undo_stack.push(("waitlist", new_record))
+            return f"{student.student_id} added to waitlist for {self.course_code}"
+
+        """for record in self.enrolled_roster:
             if record.student.student_id == student.student_id:
                 raise ValueError("Student is already enrolled.")
             
@@ -260,7 +286,7 @@ class Course:
         else:
             self.waitlist.enqueue((student, grade, enroll_date))
             self.undo_stack.push(("waitlist", student, grade, enroll_date)) 
-            return False
+            return False"""
 
     # EXTRA CREDIT 
     def undo_action(self):

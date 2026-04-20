@@ -1,5 +1,42 @@
 import unittest
-from classes import HashMap
+from classes import HashMap, University
+
+class TestPrereqEnrollment(unittest.TestCase):
+    """Test enrollment in courses with prerequisites.
+    Designed by: Mufeed Dudha"""
+    def setUp(self):
+        self.uni = University()
+        # Setup: CSE1010 (No prereq), CSE2050 (Prereq: CSE1010)
+        self.c1 = self.uni.add_course("CSE1010", 3, 10)
+        self.c2 = self.uni.add_course("CSE2050", 3, 10)
+        self.c2.prerequisite = "CSE1010"
+        
+        self.student = self.uni.add_student("STU00001", "Test Student")
+
+    def test_enroll_no_prereq(self):
+        """Should succeed: CSE1010 has no prerequisites."""
+        msg = self.c1.request_enroll(self.student, "N/A", "2026-01-01")
+        self.assertIn("enrolled", msg)
+
+    def test_enroll_missing_prereq(self):
+        """Should fail: Student has not taken CSE1010 yet."""
+        with self.assertRaises(ValueError) as cm:
+            self.c2.request_enroll(self.student, "N/A", "2026-01-01")
+        self.assertIn("Missing prerequisite", str(cm.exception))
+
+    def test_enroll_failed_prereq(self):
+        """Should fail: Student took CSE1010 but failed it."""
+        
+        self.student.courses["CSE1010"] = "F"
+        with self.assertRaises(ValueError) as cm:
+            self.c2.request_enroll(self.student, "N/A", "2026-01-01")
+        self.assertIn("Failed prerequisite", str(cm.exception))
+
+    def test_enroll_with_valid_prereq(self):
+        """Should succeed: Student passed CSE1010 with a B."""
+        self.student.courses["CSE1010"] = "B"
+        msg = self.c2.request_enroll(self.student, "N/A", "2026-01-01")
+        self.assertIn("enrolled", msg)
 
 class TestHashMap(unittest.TestCase):
     def setUp(self):

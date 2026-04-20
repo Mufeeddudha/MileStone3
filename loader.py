@@ -1,5 +1,22 @@
 import csv
 
+def load_prerequisites(filename, university):
+    """
+    Loads prerequisite mapping from file.
+    Designed by Mufeed Dudha.
+    """
+    
+    with open(filename, newline='') as file:
+        # Crucial: Use delimiter='\t' for this specific file
+        reader = csv.DictReader(file, delimiter='\t')
+        for row in reader:
+            c_id = row['course_id'].strip()
+            p_id = row['prerequisite'].strip()
+            
+            course = university.get_course(c_id)
+            if course and p_id:
+                course.prerequisite = p_id
+
 def load_courses(filename, university):
     """Load course catalog and capacities from CSV
     Designed by: Mufeed Dudha"""
