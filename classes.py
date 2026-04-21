@@ -199,9 +199,10 @@ class EnrollmentRecord:
     Represents an enrollment record with student and enrollment date.
     Designed by: Marco Sileo Jr.
     """
-    def __init__(self, student, date):
-        """Initialize an enrollment record with a student and enrollment date."""
+    def __init__(self, student, grade, date):
+        """Initialize an enrollment record with a student, grade, and enrollment date."""
         self.student = student
+        self.grade = grade
         self.date = date
 
 
@@ -255,7 +256,7 @@ class Course:
         if any(rec.student.student_id == student.student_id for rec in self.enrolled_roster):
             raise ValueError("Student is already enrolled.")
         
-        new_record = EnrollmentRecord(student, enroll_date)
+        new_record = EnrollmentRecord(student, grade, enroll_date)
         if len(self.enrolled_roster) < self.capacity:
             self.enrolled_roster.append(new_record)
             student.courses[self.course_code] = grade
@@ -297,37 +298,32 @@ class Course:
             return "Nothing to Undo"
         
         
-        action, student, grade, date = self.undo_stack.pop()
+        action, record = self.undo_stack.pop()
 
         if action == "enroll":
            
-            self.enrolled_roster = [r for r in self.enrolled_roster if r.student.student_id != student.student_id]
-            if self in student.courses: 
-                del student.courses[self]
+            self.enrolled_roster = [r for r in self.enrolled_roster if r.student.student_id != record.student.student_id]
+            if self in record.student.courses: 
+                del record.student.courses[self]
 
         elif action == "waitlist":
-            
-            if self.waitlist.is_empty():
-                return "Waitlist already empty"
-            
             
             temp_queue = LinkedQueue()
             while not self.waitlist.is_empty():
                 item = self.waitlist.dequeue()
-                
-                if item[0].student_id != student.student_id:
+                if item.student.student_id != record.student.student_id:
                     temp_queue.enqueue(item)
             self.waitlist = temp_queue
 
         elif action == "drop":
             
-            self.enrolled_roster.append(EnrollmentRecord(student, date))
-            student.courses[self] = grade
+            self.enrolled_roster.append(record)
+            record.student.courses[self] = record.grade
             
             self.sorted_by = None
 
         self._sync_legacy_list()
-        return f"Undid {action} for {student.name}"
+        return f"Undid {action} for {record.student.name}"
 
     # Extra Credit
     def drop(self, student_id):
@@ -349,17 +345,19 @@ class Course:
         date = record.date
 
         
-        self.undo_stack.push(("drop", student, grade, date))
-
         
         dropped_record = self.enrolled_roster.pop(index)
+        self.undo_stack.push(("drop", dropped_record))
         if self in student.courses:
             del student.courses[self]
         
         
         if not self.waitlist.is_empty():
-            next_student, next_grade, next_date = self.waitlist.dequeue()
-            self.enrolled_roster.append(EnrollmentRecord(next_student, next_date))
+            next_record = self.waitlist.dequeue()
+            next_student = next_record.student
+            next_grade = "N/A"  # Waitlisted students don't have grades yet
+            next_date = next_record.date
+            self.enrolled_roster.append(EnrollmentRecord(next_student, next_grade, next_date))
             next_student.courses[self] = next_grade
             self.sorted_by = None 
 
