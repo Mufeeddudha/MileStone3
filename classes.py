@@ -42,7 +42,8 @@ def merge(left, right, key_func):
 # partition
 
 def partition(arr, low, high, key_func):
-    """Partition function for quicksort based on a key function."""
+    """Partition function for quicksort based on a key function.
+    Designed by: Mufeed Dudha"""
     pivot_value = key_func(arr[high])
     i = low - 1
 
@@ -56,7 +57,8 @@ def partition(arr, low, high, key_func):
 
 
 def quick_sort(arr, key_func):
-    """Quicksort implementation for sorting based on a key function."""
+    """Quicksort implementation for sorting based on a key function.
+    Designed by: Mufeed Dudha"""
     def _quick_sort(items, low, high):
         if low < high:
             pivot_index = partition(items, low, high, key_func)
@@ -393,28 +395,6 @@ class Course:
             self.waitlist.enqueue(new_record)
             self.undo_stack.push(("waitlist", new_record))
             return f"{student.student_id} added to waitlist for {self.course_code}"
-
-        """for record in self.enrolled_roster:
-            if record.student.student_id == student.student_id:
-                raise ValueError("Student is already enrolled.")
-            
-        current = self.waitlist.head
-        while current:
-            waitlist_student = current.data[0]
-            if waitlist_student.student_id == student.student_id:
-                raise ValueError("Student is already on the waitlist.")
-            current = current.next
-
-        if len(self.enrolled_roster) < self.capacity:
-            self.enrolled_roster.append(EnrollmentRecord(student, enroll_date))
-            self.sorted_by = None
-            self._sync_legacy_list()
-            self.undo_stack.push(("enroll", student, grade, enroll_date))
-            return True
-        else:
-            self.waitlist.enqueue((student, grade, enroll_date))
-            self.undo_stack.push(("waitlist", student, grade, enroll_date)) 
-            return False"""
 
     # EXTRA CREDIT 
     def undo_action(self):

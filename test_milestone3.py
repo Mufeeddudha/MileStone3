@@ -6,7 +6,7 @@ class TestPrereqEnrollment(unittest.TestCase):
     Designed by: Mufeed Dudha"""
     def setUp(self):
         self.uni = University()
-        # Setup: CSE1010 (No prereq), CSE2050 (Prereq: CSE1010)
+        # Setup: CSE1010 (No prereq), CSE2050 (Prereq: CSE1010) 
         self.c1 = self.uni.add_course("CSE1010", 3, 10)
         self.c2 = self.uni.add_course("CSE2050", 3, 10)
         self.c2.prerequisite = "CSE1010"
@@ -39,6 +39,8 @@ class TestPrereqEnrollment(unittest.TestCase):
         self.assertIn("enrolled", msg)
 
 class TestHashMap(unittest.TestCase):
+    """Test the custom HashMap implementation.
+    Designed by: Mufeed Dudha"""
     def setUp(self):
         """Set up a new HashMap instance before each test.
         """

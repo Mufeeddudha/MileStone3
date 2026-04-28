@@ -7,7 +7,7 @@ def load_prerequisites(filename, university):
     """
     
     with open(filename, newline='') as file:
-        # Crucial: Use delimiter='\t' for this specific file
+        # used tab delimiter from external resource (https://stackoverflow.com/questions/3160152/python-indexing-a-file-that-is-tab-delimited)
         reader = csv.DictReader(file, delimiter='\t')
         for row in reader:
             c_id = row['course_id'].strip()
@@ -41,6 +41,7 @@ def load_students(filename, university):
     """
     Updated to match enrollments_CSE10.csv format:
     Columns: student_id, course_id, term, grade
+    Designed by: Mufeed Dudha
     """
     with open(filename, newline='') as file:
         reader = csv.DictReader(file)

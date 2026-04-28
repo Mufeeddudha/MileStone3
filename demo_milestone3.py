@@ -2,32 +2,33 @@ from classes import University, merge_sort, quick_sort, recursive_binary_search
 from loader import load_courses, load_students, load_prerequisites
 
 def run_milestone3_demo():
-    print("==========================================")
+    """ Demonstrates Milestone 3 features: HashMap, prerequisite checking, waitlist management, sorting, binary search, and undo functionality.
+    Designed by: Mufeed Dudha"""
+    print("-" * 50)
     print("   UNIVERSITY SYSTEM MILESTONE 3 DEMO")
-    print("        Designed by: Mufeed Dudha")
-    print("==========================================\n")
+    print("")
+    
 
     uni = University()
 
-    # --- STEP 1: LOADING DATA (Milestones 1, 2, & 3) ---
-    print("--- Step 1: Loading Data Structures ---")
+    # Loading data
+    
     load_courses("course_catalog_CSE10_with_capacity.csv", uni)
     load_students("enrollments_CSE10.csv", uni)
     load_prerequisites("cse_prerequisites.csv", uni)
-    print("Successfully loaded Courses, Students, and Prerequisites into HashMaps.\n")
 
-    # --- STEP 2: HASHMAP LOOKUP (Milestone 3) ---
-    print("--- Step 2: Custom HashMap Verification ---")
+    # Hashmap verification
+    print("Hashmap verification")
     test_student_id = "STU00164"
-    # Demonstrating the use of your custom .get() method
+    #
     student = uni.students.get(test_student_id)
     if student:
         print(f"HashMap Lookup Success: Found {student.name} ({student.student_id})")
     print("")
 
-    # --- STEP 3: PREREQUISITE CHECKS (Milestone 3 Lab) ---
-    print("--- Step 3: Prerequisite Enrollment Logic ---")
-    cse2050 = uni.get_course("CSE2050") # Has prereq: CSE1010
+    # Prequisite checking
+    print("Prequisite checking")
+    cse2050 = uni.get_course("CSE2050") # prereq: CSE1010
     new_stu = uni.add_student("STU99999", "Demo Student")
     
     print(f"Attempting to enroll {new_stu.name} in {cse2050.course_code}...")
@@ -48,39 +49,41 @@ def run_milestone3_demo():
         print(f"Error: {e}")
     print("")
 
-    # --- STEP 4: WAITLIST LOGIC (Milestone 2) ---
-    print("--- Step 4: Waitlist & Capacity Management ---")
-    cse1010 = uni.get_course("CSE1010")
-    print(f"Course {cse1010.course_code} Roster Size: {len(cse1010.enrolled_roster)}")
-    print(f"Course {cse1010.course_code} Waitlist Size: {len(cse1010.waitlist)}")
+    # Waitlist and capacity management
+    print("Waitlist and capacity management")
+    cse2050 = uni.get_course("CSE2050")
+    print(f"Course {cse2050.course_code} Roster Size: {len(cse2050.enrolled_roster)}")
+    print(f"Course {cse2050.course_code} Waitlist Size: {len(cse2050.waitlist)}")
     print("")
 
-    # --- STEP 5: LOGARITHMIC SORTING (Milestone 3) ---
-    print("--- Step 5: O(n log n) Sorting (Merge Sort) ---")
+    #Sorting
+    print("Sorting (Merge Sort)")
     # Sort roster by Name using Merge Sort
-    cse1010.enrolled_roster = merge_sort(cse1010.enrolled_roster, lambda x: x.student.name)
+    cse2050.enrolled_roster = merge_sort(cse2050.enrolled_roster, lambda x: x.student.name)
     print("Roster sorted by Student Name using Merge Sort.")
-    print(f"Top 3 students: {[r.student.name for r in cse1010.enrolled_roster[:3]]}\n")
+    print(f"Top 3 students: {[r.student.name for r in cse2050.enrolled_roster[:3]]}\n")
 
-    # --- STEP 6: BINARY SEARCH & DROP (Milestone 2) ---
-    print("--- Step 6: Binary Search & Student Drop ---")
-    # Must sort by ID for Binary Search to work
-    cse1010.enrolled_roster = quick_sort(cse1010.enrolled_roster, lambda x: x.student.student_id)
-    target_id = cse1010.enrolled_roster[5].student.student_id
+    # Binary Search and drop 
+    print("Binary Search and drop ")
+    # Sort by ID for Binary Search to work
+    cse2050.enrolled_roster = quick_sort(cse2050.enrolled_roster, lambda x: x.student.student_id)
+    target_id = cse2050.enrolled_roster[5].student.student_id
     
     print(f"Searching for {target_id} using Recursive Binary Search...")
-    dropped_student = cse1010.drop(target_id)
+    dropped_student = cse2050.drop(target_id)
     if dropped_student:
         print(f"Successfully dropped {dropped_student.name}. Waitlist promoted if available.")
     print("")
 
-    # --- STEP 7: UNDO ACTION (Extra Credit) ---
-    print("--- Step 7: Extra Credit Undo ---")
-    undo_msg = cse1010.undo_action()
+    # Undo functionality
+    print("Undo functionality")
+    undo_msg = cse2050.undo_action()
     print(f"Action undone: {undo_msg}")
-    print("==========================================")
+    
+    print("")
     print("            DEMO COMPLETE")
-    print("==========================================")
+    print("-" * 50)
+    
 
 if __name__ == "__main__":
     run_milestone3_demo()
