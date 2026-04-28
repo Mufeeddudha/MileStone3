@@ -1,0 +1,29 @@
+HashMap Operations (Put and Get)
+
+The HashMap has an average time complexity of O(1) for both put and get operations. 
+To handle collisions, separate chaining is used. 
+To keep performance sustained, a load factor threshold of 0.8 is used. 
+When the map reaches 80% capacity, a rehash operation doubles the table size, ensuring that average chain lengths remain small. 
+While the theoretical worst-case is O(n) if all keys hash to a single index, regular rehashing makes this unlikely.
+
+Sorting Algorithms Complexity
+
+Two sorting algorithms are implemented:
+
+Merge Sort: This algorithm provides a guaranteed time complexity of O(nlogn). 
+It recursively splitting the roster into halves and merging them back in sorted order.
+
+Quick Sort: This algorithm offers an average-case complexity of O(nlogn). 
+However, its worst-case complexity is O(n²), which can occur if the pivot selection picks the smallest or largest elements, such as when sorting already-sorted data.
+
+Algorithm Comparison and Preference
+
+While both algorithms share an average O(n log n) runtime, they serve different needs:
+
+Merge Sort is preferred when stability is required. 
+It ensures that records with identical keys maintain their original relative order. 
+Because its performance never drops to O(n²), it is the most reliable choice.
+
+Quick Sort is often preferred for general in-memory applications because it typically has lower constant factors and better cache performance, making it faster in practice on average data.
+
+For this system, Merge Sort is the recommended choice. Its complexity of O(nlogn) ensures consistent results and prevising the order of students. 

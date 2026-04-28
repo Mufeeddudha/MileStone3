@@ -8,6 +8,64 @@ GRADE_POINTS = {
 'F' : 0.0,
 'N/A': 0.0
 }
+# merge sort
+def merge_sort(arr, key_func):
+    """Merge sort implementation for sorting by a key function.
+    Designed by: Mufeed Dudha"""
+    if len(arr) <= 1:
+        return arr[:]
+
+    mid = len(arr) // 2
+    left_half = merge_sort(arr[:mid], key_func)
+    right_half = merge_sort(arr[mid:], key_func)
+
+    return merge(left_half, right_half, key_func)
+
+def merge(left, right, key_func):
+    """Merge two sorted halves of an array based on a key function.
+    Designed by: Marc Sileo Jr."""
+    merged = []
+    i = j = 0
+
+    while i < len(left) and j < len(right):
+        if key_func(left[i]) <= key_func(right[j]):
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged
+
+# partition
+
+def partition(arr, low, high, key_func):
+    """Partition function for quicksort based on a key function."""
+    pivot_value = key_func(arr[high])
+    i = low - 1
+
+    for j in range(low, high):
+        if key_func(arr[j]) <= pivot_value:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+
+
+def quick_sort(arr, key_func):
+    """Quicksort implementation for sorting based on a key function."""
+    def _quick_sort(items, low, high):
+        if low < high:
+            pivot_index = partition(items, low, high, key_func)
+            _quick_sort(items, low, pivot_index - 1)
+            _quick_sort(items, pivot_index + 1, high)
+
+    sorted_arr = arr[:]
+    _quick_sort(sorted_arr, 0, len(sorted_arr) - 1)
+    return sorted_arr
 
 # Hashmap
 class HashNode:
@@ -53,16 +111,82 @@ class HashMap:
             curr.next = HashNode(key, value)
             self.size += 1
 
-    def get(self, key):
-        """Retrieve the value associated with a given key."""
+    def _find_node(self, key):
+        """Return the node associated with a key, or None if not found."""
         index = self._hash(key)
         curr = self.table[index]
-
         while curr:
             if curr.key == key:
-                return curr.value
+                return curr
             curr = curr.next
         return None
+
+    def get(self, key, default=None):
+        """Retrieve the value associated with a given key, or return default."""
+        node = self._find_node(key)
+        return node.value if node else default
+
+    def __contains__(self, key):
+        """Return True if the key exists in the HashMap."""
+        return self._find_node(key) is not None
+
+    def __getitem__(self, key):
+        """Support bracket access: hashmap[key]."""
+        node = self._find_node(key)
+        if node is None:
+            raise KeyError(key)
+        return node.value
+
+    def __setitem__(self, key, value):
+        """Support bracket insertion: hashmap[key] = value."""
+        self.put(key, value)
+
+    def __delitem__(self, key):
+        """Support deletion of a key using del hashmap[key]."""
+        index = self._hash(key)
+        curr = self.table[index]
+        prev = None
+        while curr:
+            if curr.key == key:
+                if prev is None:
+                    self.table[index] = curr.next
+                else:
+                    prev.next = curr.next
+                self.size -= 1
+                return
+            prev = curr
+            curr = curr.next
+        raise KeyError(key)
+
+    def __iter__(self):
+        """Iterate over keys in the HashMap."""
+        for bucket in self.table:
+            curr = bucket
+            while curr:
+                yield curr.key
+                curr = curr.next
+
+    def keys(self):
+        """Return a list of keys."""
+        return list(self)
+
+    def items(self):
+        """Return a list of (key, value) pairs."""
+        items = []
+        for bucket in self.table:
+            curr = bucket
+            while curr:
+                items.append((curr.key, curr.value))
+                curr = curr.next
+        return items
+
+    def values(self):
+        """Return a list of values."""
+        return [value for _, value in self.items()]
+
+    def __len__(self):
+        """Return the number of items stored in the HashMap."""
+        return self.size
 
     def rehash(self):
         """Resize the hash table and rehash all existing key-value pairs."""
@@ -226,8 +350,9 @@ class Course:
         self.credits = credits
         self.capacity = capacity
          
-
+        # Milestone 3 addition
         self.prerequisite = None
+
         self.enrolled_roster = []
         self.waitlist = LinkedQueue()
         self.undo_stack = LinkedStack()
@@ -241,10 +366,12 @@ class Course:
 
     # Waitlist and Enrollment
     def request_enroll(self, student, grade, enroll_date):
-        """Attempts to enroll a student, pushing to waitlist if at capacity, adds them to the waitlist."""
+        """Attempts to enroll a student, pushing to waitlist if at capacity, adds them to the waitlist.
+        Designed by: Marc Sileo Jr."""
 
         if self.prerequisite:
-            """"""
+            """Check if the student has met the prerequisite by looking up their grade for the prerequisite course.
+            If they haven't taken it, or if they failed it, raise an error."""
             prev_grade = student.courses.get(self.prerequisite)
 
             if prev_grade is None:
@@ -368,11 +495,12 @@ class Course:
     def sort_enrolled(self, by, algorithm):
         """Sorts enrolled roster by name, id, or date using Insertion or Selection sort.
         Designed by: Marco Sileo Jr."""
-        if by not in ['name', 'id', 'date']:
-            raise ValueError("Invalid sort key. Choose 'name', 'id', or 'date'.")
-            
-        if algorithm not in ['insertion', 'selection']:
-            raise ValueError("Invalid algorithm. Choose 'insertion' or 'selection'.")
+        key_func = (lambda x: x.student.student_id) if by == 'id' else (lambda x: x.student.name)
+    
+        if algorithm == 'merge':
+            self.enrolled_roster = merge_sort(self.enrolled_roster, key_func)
+        elif algorithm == 'quick':
+            self.enrolled_roster = quick_sort(self.enrolled_roster, key_func)
         
 
         
@@ -441,7 +569,7 @@ class Student:
 
         self.student_id = student_id
         self.name = name
-        self.courses = {} 
+        self.courses = HashMap() 
 
     def enroll(self, course, grade, date):
         """
@@ -538,7 +666,7 @@ class University:
     """
     def __init__(self):
         """ Initialize a University object with empty student and course"""
-        self.students = {}
+        self.students = HashMap()
         self.courses = {}
 
     def add_course(self, course_code, credits, capacity=100):
