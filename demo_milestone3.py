@@ -31,8 +31,9 @@ def run_milestone3_demo():
     cse2050 = uni.get_course("CSE2050") # prereq: CSE1010
     new_stu = uni.add_student("STU99999", "Demo Student")
     
-    print(f"Attempting to enroll {new_stu.name} in {cse2050.course_code}...")
-    print(f"(Required Prerequisite: {cse2050.prerequisite})")
+    print(f"Attempting to enroll {new_stu.student_id} in {cse2050.course_code}...")
+    prereq_list = [p for p in cse2050.prerequisite]
+    print(f"(Required Prerequisite: {', '.join(prereq_list)})")
     
     try:
         cse2050.request_enroll(new_stu, "N/A", "2026-01-01")

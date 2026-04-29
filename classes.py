@@ -372,13 +372,13 @@ class Course:
         Designed by: Marc Sileo Jr."""
 
         for prereq_id in self.prerequisite: 
-            prev_grade = student.courses.get(prereq_id)
+            student_grade = student.courses.get(prereq_id)
 
-            if prev_grade is None:
-                raise ValueError(f"Missing prerequisite: {self.prerequisite}")
+            if student_grade is None:
+                raise ValueError(f"Missing prerequisite: {prereq_id }")
             
-            if prev_grade == 'F':
-                raise ValueError(f"Failed prerequisite: {self.prerequisite}")
+            if student_grade == 'F':
+                raise ValueError(f"Failed prerequisite: {prereq_id }")
             
         if any(rec.student.student_id == student.student_id for rec in self.enrolled_roster):
             raise ValueError("Student is already enrolled.")
