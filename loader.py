@@ -14,8 +14,8 @@ def load_prerequisites(filename, university):
             p_id = row['prerequisite'].strip()
             
             course = university.get_course(c_id)
-            if course and p_id:
-                course.prerequisite = p_id
+            if course:
+                course.prerequisite.put(p_id, True)
 
 def load_courses(filename, university):
     """Load course catalog and capacities from CSV

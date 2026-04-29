@@ -10,10 +10,10 @@ Sorting Algorithms Complexity
 
 Two sorting algorithms are implemented:
 
-Merge Sort: This algorithm provides a guaranteed time complexity of O(nlogn). 
+Merge Sort: This algorithm provides a time complexity of O(nlogn). 
 It recursively splitting the roster into halves and merging them back in sorted order.
 
-Quick Sort: This algorithm offers an average-case complexity of O(nlogn). 
+Quick Sort: This algorithm offers an average and best case complexity of O(nlogn). 
 However, its worst-case complexity is O(n²), which can occur if the pivot selection picks the smallest or largest elements, such as when sorting already-sorted data.
 
 Algorithm Comparison and Preference

@@ -1,6 +1,33 @@
 import unittest
 from classes import HashMap, University
 
+
+class TestSorting(unittest.TestCase):
+    def setUp(self):
+        self.uni = University()
+        self.course = self.uni.add_course("CSE1010", 3, 10)
+        
+        s1 = self.uni.add_student("STU00003", "Zebra")
+        s2 = self.uni.add_student("STU00001", "Apple")
+        s3 = self.uni.add_student("STU00002", "Middly")
+        
+       
+        self.course.request_enroll(s1, "N/A", "2026-01-01")
+        self.course.request_enroll(s2, "N/A", "2026-01-01")
+        self.course.request_enroll(s3, "N/A", "2026-01-01")
+
+    def test_merge_sort_by_name(self):
+        from classes import merge_sort
+        sorted_roster = merge_sort(self.course.enrolled_roster, lambda x: x.student.name)
+        names = [r.student.name for r in sorted_roster]
+        self.assertEqual(names, ["Apple", "Middly", "Zebra"])
+
+    def test_quick_sort_by_id(self):
+        from classes import quick_sort
+        sorted_roster = quick_sort(self.course.enrolled_roster, lambda x: x.student.student_id)
+        ids = [r.student.student_id for r in sorted_roster]
+        self.assertEqual(ids, ["STU00001", "STU00002", "STU00003"])
+
 class TestPrereqEnrollment(unittest.TestCase):
     """Test enrollment in courses with prerequisites.
     Designed by: Mufeed Dudha"""
@@ -9,7 +36,7 @@ class TestPrereqEnrollment(unittest.TestCase):
         # Setup: CSE1010 (No prereq), CSE2050 (Prereq: CSE1010) 
         self.c1 = self.uni.add_course("CSE1010", 3, 10)
         self.c2 = self.uni.add_course("CSE2050", 3, 10)
-        self.c2.prerequisite = "CSE1010"
+        self.c2.prerequisite.put("CSE1010", True)
         
         self.student = self.uni.add_student("STU00001", "Test Student")
 

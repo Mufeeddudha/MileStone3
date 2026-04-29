@@ -94,7 +94,7 @@ class HashMap:
     
     def put(self, key, value):
         """Insert or update a key-value pair in the hash map."""
-        if self.size / self.capacity > 0.8:
+        if self.size / self.capacity >= 0.8:
             self.rehash()
 
         index = self._hash(key)
@@ -353,7 +353,7 @@ class Course:
         self.capacity = capacity
          
         # Milestone 3 addition
-        self.prerequisite = None
+        self.prerequisite = HashMap()
 
         self.enrolled_roster = []
         self.waitlist = LinkedQueue()
@@ -371,10 +371,8 @@ class Course:
         """Attempts to enroll a student, pushing to waitlist if at capacity, adds them to the waitlist.
         Designed by: Marc Sileo Jr."""
 
-        if self.prerequisite:
-            """Check if the student has met the prerequisite by looking up their grade for the prerequisite course.
-            If they haven't taken it, or if they failed it, raise an error."""
-            prev_grade = student.courses.get(self.prerequisite)
+        for prereq_id in self.prerequisite: 
+            prev_grade = student.courses.get(prereq_id)
 
             if prev_grade is None:
                 raise ValueError(f"Missing prerequisite: {self.prerequisite}")
@@ -410,8 +408,8 @@ class Course:
         if action == "enroll":
            
             self.enrolled_roster = [r for r in self.enrolled_roster if r.student.student_id != record.student.student_id]
-            if self in record.student.courses: 
-                del record.student.courses[self]
+            if self.course_code in record.student.courses: 
+                del record.student.courses[self.course_code]
 
         elif action == "waitlist":
             
@@ -425,7 +423,7 @@ class Course:
         elif action == "drop":
             
             self.enrolled_roster.append(record)
-            record.student.courses[self] = record.grade
+            record.student.courses[self.course_code] = record.grade
             
             self.sorted_by = None
 
@@ -448,15 +446,15 @@ class Course:
         record = self.enrolled_roster[index]
         student = record.student
         
-        grade = student.courses.get(self, "N/A")
+        grade = student.courses.get(self.course_code, "N/A")
         date = record.date
 
         
         
         dropped_record = self.enrolled_roster.pop(index)
         self.undo_stack.push(("drop", dropped_record))
-        if self in student.courses:
-            del student.courses[self]
+        if self.course_code in student.courses:
+            del student.courses[self.course_code]
         
         
         if not self.waitlist.is_empty():
@@ -538,7 +536,7 @@ class Student:
 
     Class designed by: Marc Sileo Jr.
     """
-    def __init__(self, student_id: str, name: str):
+    def __init__(self, student_id: str, name: str, university):
         """
         Initialize a Student object with student_id, name, and courses.
         """
@@ -549,7 +547,8 @@ class Student:
 
         self.student_id = student_id
         self.name = name
-        self.courses = HashMap() 
+        self.university = university
+        self.courses = HashMap()  # course_code to grade 
 
     def enroll(self, course, grade, date):
         """
@@ -558,11 +557,11 @@ class Student:
         if grade not in GRADE_POINTS:
             raise ValueError("Invalid grade")
 
-        if course not in self.courses:
+        if course.course_code not in self.courses:
             enrolled = course.request_enroll(self, grade, date)
             
             if enrolled:
-                self.courses[course] = grade
+                self.courses[course.course_code] = grade
 
     def update_grade(self, course, grade):
         """
@@ -581,11 +580,11 @@ class Student:
         total_points = 0
         total_credits = 0
 
-        for course in self.courses:
-            grade = self.courses[course]
-
-            total_points += GRADE_POINTS[grade] * course.credits
-            total_credits += course.credits
+        for course_code, grade in self.courses.items():
+            course = self.university.get_course(course_code)
+            if course:
+                total_points += GRADE_POINTS[grade] * course.credits
+                total_credits += course.credits
 
         if total_credits == 0:
             return 0.0
@@ -604,15 +603,15 @@ class Student:
         and credits.
         """
         info = []
-        for course in self.courses:
-            grade = self.courses[course]
+        for course_code, grade in self.courses.items():
+            course = self.university.get_course(course_code)
+            if course:
+                course_data = {}
+                course_data["course_code"] = course_code
+                course_data["grade"] = grade
+                course_data["credits"] = course.credits
 
-            course_data = {}
-            course_data["course_code"] = course.course_code
-            course_data["grade"] = grade
-            course_data["credits"] = course.credits
-
-            info.append(course_data)
+                info.append(course_data)
 
         return info
     
@@ -626,12 +625,13 @@ class Student:
         print("======================================")
         total_credits = 0
 
-        for course in self.courses:
-            grade = self.courses[course]
-            print("Course:", course.course_code,
-                  "| Grade:", grade,
-                  "| Credits:", course.credits)
-            total_credits += course.credits
+        for course_code, grade in self.courses.items():
+            course = self.university.get_course(course_code)
+            if course:
+                print("Course:", course_code,
+                      "| Grade:", grade,
+                      "| Credits:", course.credits)
+                total_credits += course.credits
         print("--------------------------------------")
         print("Total Credits:", total_credits)
         print("GPA:", self.calculate_gpa())
@@ -661,7 +661,7 @@ class University:
         """
         Adds a student to the university's student registry.
         """
-        new_student = Student(student_id, name)
+        new_student = Student(student_id, name, self)
         self.students[student_id] = new_student
         return new_student
         """if student_id not in self.students:
