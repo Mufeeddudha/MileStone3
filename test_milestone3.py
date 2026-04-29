@@ -19,12 +19,14 @@ class TestSorting(unittest.TestCase):
         self.course.request_enroll(s3, "N/A", "2026-01-01")
 
     def test_merge_sort_by_name(self):
+        """Test merge sort of enrolled roster by student name."""
         from classes import merge_sort
         sorted_roster = merge_sort(self.course.enrolled_roster, lambda x: x.student.name)
         names = [r.student.name for r in sorted_roster]
         self.assertEqual(names, ["Apple", "Middly", "Zebra"])
 
     def test_quick_sort_by_id(self):
+        """Test quick sort of enrolled roster by student ID."""
         from classes import quick_sort
         sorted_roster = quick_sort(self.course.enrolled_roster, lambda x: x.student.student_id)
         ids = [r.student.student_id for r in sorted_roster]
