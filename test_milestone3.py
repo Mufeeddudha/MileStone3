@@ -4,6 +4,8 @@ from classes import HashMap, University
 
 class TestSorting(unittest.TestCase):
     def setUp(self):
+        """Set up a university and a course with students for sorting tests.
+        Designed by: Mufeed Dudha"""
         self.uni = University()
         self.course = self.uni.add_course("CSE1010", 3, 10)
         
