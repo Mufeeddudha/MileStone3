@@ -20,7 +20,7 @@ def run_milestone3_demo():
     # Hashmap verification
     print("Hashmap verification")
     test_student_id = "STU00164"
-    #
+    
     student = uni.students.get(test_student_id)
     if student:
         print(f"HashMap Lookup Success: Found {student.name} ({student.student_id})")
@@ -67,18 +67,24 @@ def run_milestone3_demo():
     print("Binary Search and drop ")
     # Sort by ID for Binary Search to work
     cse2050.enrolled_roster = quick_sort(cse2050.enrolled_roster, lambda x: x.student.student_id)
-    target_id = cse2050.enrolled_roster[5].student.student_id
+    target_id = cse2050.enrolled_roster[0].student.student_id
     
     print(f"Searching for {target_id} using Recursive Binary Search...")
     dropped_student = cse2050.drop(target_id)
     if dropped_student:
         print(f"Successfully dropped {dropped_student.name}. Waitlist promoted if available.")
     print("")
+    print(f"Course {cse2050.course_code} Roster Size: {len(cse2050.enrolled_roster)}")
+    print(f"Course {cse2050.course_code} Waitlist Size: {len(cse2050.waitlist)}")
+    print("")
 
     # Undo functionality
     print("Undo functionality")
     undo_msg = cse2050.undo_action()
     print(f"Action undone: {undo_msg}")
+    print(f"Course {cse2050.course_code} Roster Size: {len(cse2050.enrolled_roster)}")
+    print(f"Course {cse2050.course_code} Waitlist Size: {len(cse2050.waitlist)}")
+    print("")
     
     print("")
     print("            DEMO COMPLETE")

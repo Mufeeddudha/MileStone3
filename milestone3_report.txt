@@ -24,6 +24,11 @@ Merge Sort is preferred when stability is required.
 It ensures that records with identical keys maintain their original relative order. 
 Because its performance never drops to O(n²), it is the most reliable choice.
 
-Quick Sort is often preferred for general in-memory applications because it typically has lower constant factors and better cache performance, making it faster in practice on average data.
 
-For this system, Merge Sort is the recommended choice. Its complexity of O(nlogn) ensures consistent results and prevising the order of students. 
+
+Quick Sort is as its in-place and doesn't require additional storage along with better cache performance, 
+making it faster in practice on average data.
+# Information from https://www.geeksforgeeks.org/dsa/quicksort-better-mergesort/
+
+For this system, Merge Sort is the recommended choice. 
+Its complexity of O(nlogn) ensures consistent results even with large datasets and preserving the order of students. 
