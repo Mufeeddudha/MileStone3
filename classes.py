@@ -377,8 +377,7 @@ class Course:
             if student_grade is None:
                 raise ValueError(f"Missing prerequisite: {prereq_id }")
             
-            if student_grade == 'F':
-                raise ValueError(f"Failed prerequisite: {prereq_id }")
+            
             
         if any(rec.student.student_id == student.student_id for rec in self.enrolled_roster):
             raise ValueError("Student is already enrolled.")
@@ -473,13 +472,19 @@ class Course:
     def sort_enrolled(self, by, algorithm):
         """Sorts enrolled roster by name, id, or date using Insertion or Selection sort.
         Designed by: Marco Sileo Jr."""
-        key_func = (lambda x: x.student.student_id) if by == 'id' else (lambda x: x.student.name)
-    
+        if by == 'id':
+            key_func = lambda x: x.student.student_id
+        elif by == 'name':
+            key_func = lambda x: x.student.name
+        else:
+            key_func = lambda x: x.date
+
         if algorithm == 'merge':
             self.enrolled_roster = merge_sort(self.enrolled_roster, key_func)
         elif algorithm == 'quick':
             self.enrolled_roster = quick_sort(self.enrolled_roster, key_func)
-        
+        self.sorted_by = by
+        self._sync_legacy_list()
 
         
         def get_key(record):

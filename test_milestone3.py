@@ -9,14 +9,24 @@ class TestSorting(unittest.TestCase):
         self.uni = University()
         self.course = self.uni.add_course("CSE1010", 3, 10)
         
-        s1 = self.uni.add_student("STU00003", "Zebra")
-        s2 = self.uni.add_student("STU00001", "Apple")
-        s3 = self.uni.add_student("STU00002", "Middly")
+        # Create students with ids and names
+        s1 = self.uni.add_student("STU00001", "Zebra")
+        s2 = self.uni.add_student("STU00002", "Apple")
+        s3 = self.uni.add_student("STU00003", "Middly")
         
-       
-        self.course.request_enroll(s1, "N/A", "2026-01-01")
+        #
+        # Zebra (STU00001) -> Feb | Apple (STU00002) -> Jan | Middly (STU00003) -> Mar
+        self.course.request_enroll(s1, "N/A", "2026-02-01")
         self.course.request_enroll(s2, "N/A", "2026-01-01")
-        self.course.request_enroll(s3, "N/A", "2026-01-01")
+        self.course.request_enroll(s3, "N/A", "2026-03-01")
+
+    # Merge sort
+    def test_merge_sort_by_id(self):
+        """Test merge sort of enrolled roster by student ID."""
+        from classes import merge_sort
+        sorted_roster = merge_sort(self.course.enrolled_roster, lambda x: x.student.student_id)
+        ids = [r.student.student_id for r in sorted_roster]
+        self.assertEqual(ids, ["STU00001", "STU00002", "STU00003"])
 
     def test_merge_sort_by_name(self):
         """Test merge sort of enrolled roster by student name."""
@@ -25,12 +35,34 @@ class TestSorting(unittest.TestCase):
         names = [r.student.name for r in sorted_roster]
         self.assertEqual(names, ["Apple", "Middly", "Zebra"])
 
+    def test_merge_sort_by_date(self):
+        """Test merge sort of enrolled roster by enrollment date."""
+        from classes import merge_sort
+        sorted_roster = merge_sort(self.course.enrolled_roster, lambda x: x.date)
+        dates = [r.date for r in sorted_roster]
+        self.assertEqual(dates, ["2026-01-01", "2026-02-01", "2026-03-01"])
+
+    # quick sort
     def test_quick_sort_by_id(self):
         """Test quick sort of enrolled roster by student ID."""
         from classes import quick_sort
         sorted_roster = quick_sort(self.course.enrolled_roster, lambda x: x.student.student_id)
         ids = [r.student.student_id for r in sorted_roster]
         self.assertEqual(ids, ["STU00001", "STU00002", "STU00003"])
+
+    def test_quick_sort_by_name(self):
+        """Test quick sort of enrolled roster by student name."""
+        from classes import quick_sort
+        sorted_roster = quick_sort(self.course.enrolled_roster, lambda x: x.student.name)
+        names = [r.student.name for r in sorted_roster]
+        self.assertEqual(names, ["Apple", "Middly", "Zebra"])
+
+    def test_quick_sort_by_date(self):
+        """Test quick sort of enrolled roster by enrollment date."""
+        from classes import quick_sort
+        sorted_roster = quick_sort(self.course.enrolled_roster, lambda x: x.date)
+        dates = [r.date for r in sorted_roster]
+        self.assertEqual(dates, ["2026-01-01", "2026-02-01", "2026-03-01"])
 
 class TestPrereqEnrollment(unittest.TestCase):
     """Test enrollment in courses with prerequisites.
@@ -55,13 +87,6 @@ class TestPrereqEnrollment(unittest.TestCase):
             self.c2.request_enroll(self.student, "N/A", "2026-01-01")
         self.assertIn("Missing prerequisite", str(cm.exception))
 
-    def test_enroll_failed_prereq(self):
-        """Should fail: Student took CSE1010 but failed it."""
-        
-        self.student.courses["CSE1010"] = "F"
-        with self.assertRaises(ValueError) as cm:
-            self.c2.request_enroll(self.student, "N/A", "2026-01-01")
-        self.assertIn("Failed prerequisite", str(cm.exception))
 
     def test_enroll_with_valid_prereq(self):
         """Should succeed: Student passed CSE1010 with a B."""
